@@ -557,21 +557,6 @@ definition {
 		Alert.viewSuccessMessage();
 	}
 
-	macro assertAllowMultipleSelectionsField {
-		var checkboxName = "Allow Multiple Selections";
-
-		AssertClick.assertPartialTextClickAt(
-			key_fieldFieldLabel = "${fieldFieldLabel}",
-			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER",
-			value1 = "${fieldFieldLabel}");
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertElementPresent(locator1 = "Checkbox#ANY_CHECKBOX");
-
-		Click(locator1 = "Sidebar#BACK");
-	}
-
 	macro assertCheckboxOptions {
 		if (!(isSet(fieldIndex))) {
 			var fieldIndex = "1";
@@ -695,51 +680,6 @@ definition {
 		AssertElementPresent(
 			key_fieldName = "${fieldFieldName}",
 			locator1 = "DataEngineRenderer#WEB_CONTENT_DISABLED_FIELD");
-	}
-
-	macro assertOrderOptionsAlphabeticallyField {
-		var checkboxName = "Order Options Alphabetically";
-
-		AssertClick.assertPartialTextClickAt(
-			key_fieldFieldLabel = "${fieldFieldLabel}",
-			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER",
-			value1 = "${fieldFieldLabel}");
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertElementPresent(locator1 = "Checkbox#ANY_CHECKBOX");
-
-		Click(locator1 = "Sidebar#BACK");
-	}
-
-	macro assertRepeatableField {
-		var checkboxName = "Repeatable";
-
-		AssertClick.assertPartialTextClickAt(
-			key_fieldFieldLabel = "${fieldFieldLabel}",
-			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER",
-			value1 = "${fieldFieldLabel}");
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertElementPresent(locator1 = "Checkbox#ANY_CHECKBOX");
-
-		Click(locator1 = "Sidebar#BACK");
-	}
-
-	macro assertShowLabelField {
-		var checkboxName = "Show Label";
-
-		AssertClick.assertPartialTextClickAt(
-			key_fieldFieldLabel = "${fieldFieldLabel}",
-			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER",
-			value1 = "${fieldFieldLabel}");
-
-		Navigator.gotoNavTab(navTab = "Advanced");
-
-		AssertElementPresent(locator1 = "Checkbox#ANY_CHECKBOX");
-
-		Click(locator1 = "Sidebar#BACK");
 	}
 
 	macro assertSwitchOptions {
@@ -1801,6 +1741,66 @@ definition {
 		else if (IsElementPresent(locator1 = "Button#SAVE")) {
 			Button.clickSave();
 		}
+	}
+
+	macro assertAllowMultipleSelectionsField {
+		var checkboxName = "Allow Multiple Selections";
+
+		AssertClick.assertPartialTextClickAt(
+			key_fieldFieldLabel = "${fieldFieldLabel}",
+			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER",
+			value1 = "${fieldFieldLabel}");
+
+		Navigator.gotoNavTab(navTab = "Advanced");
+
+		AssertElementPresent(locator1 = "Checkbox#ANY_CHECKBOX");
+
+		Click(locator1 = "Sidebar#BACK");
+	}
+
+	macro assertShowLabelField {
+		var checkboxName = "Show Label";
+
+		AssertClick.assertPartialTextClickAt(
+			key_fieldFieldLabel = "${fieldFieldLabel}",
+			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER",
+			value1 = "${fieldFieldLabel}");
+
+		Navigator.gotoNavTab(navTab = "Advanced");
+
+		AssertElementPresent(locator1 = "Checkbox#ANY_CHECKBOX");
+
+		Click(locator1 = "Sidebar#BACK");
+	}
+
+	macro assertOrderOptionsAlphabeticallyField {
+		var checkboxName = "Order Options Alphabetically";
+
+		AssertClick.assertPartialTextClickAt(
+			key_fieldFieldLabel = "${fieldFieldLabel}",
+			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER",
+			value1 = "${fieldFieldLabel}");
+
+		Navigator.gotoNavTab(navTab = "Advanced");
+
+		AssertElementPresent(locator1 = "Checkbox#ANY_CHECKBOX");
+
+		Click(locator1 = "Sidebar#BACK");
+	}
+
+	macro assertRepeatableField {
+		var checkboxName = "Repeatable";
+
+		AssertClick.assertPartialTextClickAt(
+			key_fieldFieldLabel = "${fieldFieldLabel}",
+			locator1 = "DDMEditStructure#FORM_FIELD_CONTAINER",
+			value1 = "${fieldFieldLabel}");
+
+		Navigator.gotoNavTab(navTab = "Advanced");
+
+		AssertElementPresent(locator1 = "Checkbox#ANY_CHECKBOX");
+
+		Click(locator1 = "Sidebar#BACK");
 	}
 
 }
