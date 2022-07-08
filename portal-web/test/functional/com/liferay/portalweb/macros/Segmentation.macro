@@ -126,6 +126,21 @@ definition {
 		}
 	}
 
+	macro checkSegmentationReEnableWarningLink {
+		AssertClick.assertPartialTextClickAt(
+			locator1 = "Message#ERROR_3",
+			value1 = "To enable, go to Instance Settings.");
+	}
+
+	macro clickToReEnableSegmentsWarningLink {
+		Click(locator1 = "Segmentation#ENABLE_SEGMENTS_INSTANCE_SETTINGS");
+
+		AssertVisible(
+			key_configurationName = "Segments Service",
+			key_configurationScope = "Virtual Instance Scope",
+			locator1 = "SystemSettings#SCOPED_CONFIGURATION_NAME");
+	}
+
 	macro createExperienceWithSegment {
 		Click(locator1 = "PageEditor#EXPERIENCE_DEFAULT_BUTTON_NAME");
 
