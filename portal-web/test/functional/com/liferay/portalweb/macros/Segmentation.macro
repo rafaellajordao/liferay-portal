@@ -58,6 +58,21 @@ definition {
 			locator1 = "Segmentation#CRITERION_CONJUNCTION_ITEM");
 	}
 
+	macro checkSegmentationReEnableWarningLink {
+		AssertClick.assertPartialTextClickAt(
+			locator1 = "Message#ERROR_3",
+			value1 = "To enable, go to Instance Settings.");
+	}
+
+	macro clickToReEnableSegmentsWarningLink {
+		Click(locator1 = "Segmentation#ENABLE_SEGMENTS_INSTANCE_SETTINGS");
+
+		AssertVisible(
+			key_configurationName = "Segments Service",
+			key_configurationScope = "Virtual Instance Scope",
+			locator1 = "SystemSettings#SCOPED_CONFIGURATION_NAME");
+	}
+
 	macro changeCriterionInput {
 		var key_criterionInputOption = "${criterionInputOption}";
 
@@ -100,6 +115,12 @@ definition {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Message#ERROR_3",
 			value1 = "Segmentation is disabled");
+	}
+
+	macro checkSegmentationDisabledWarningUserWithoutPermission{
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR_3",
+			value1 = "administrator to enable it.");
 	}
 
 	macro checkSegmentationReEnableWarning {
