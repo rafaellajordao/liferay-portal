@@ -130,6 +130,11 @@
 	<td>//div[contains(@class,'ddm-option-entry')]//input[contains(@class,'ddm-field-text')][@value='${key_optionValue}']</td>
 	<td></td>
 </tr>
+<tr>
+	<td>FIELD_BODY</td>
+	<td>//div[contains(@class,'ddm')]//div[contains(@draggable,'true')][1]</td>
+	<td></td>
+</tr>
 </tbody>
 </table>
 </body>

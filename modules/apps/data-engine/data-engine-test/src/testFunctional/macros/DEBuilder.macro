@@ -115,6 +115,18 @@ definition {
 		Click(locator1 = "Sidebar#BACK");
 	}
 
+	macro assertBooleanFieldReference {
+		Click(locator1 = "DataEngineBuilder#FIELD_BODY");
+
+		Navigator.gotoNavTab(navTab = "Advanced");
+
+		AssertTextEquals.assertValue(
+			locator1 = "Sidebar#DDM_FIELD_REFERENCE",
+			value1 = "${fieldReference}");
+
+		Click(locator1 = "Sidebar#BACK");
+	}
+
 	macro assertDeleteIsDisabled {
 		AssertElementPresent(
 			key_text = "Delete",
@@ -328,6 +340,19 @@ definition {
 		MenuItem.click(menuItem = "Delete");
 
 		Button.clickDelete();
+	}
+
+	macro editBooleanFieldReference {
+		Click(locator1 = "DataEngineBuilder#FIELD_BODY");
+
+		Navigator.gotoNavTab(navTab = "Advanced");
+
+		Type(
+			key_fieldLabel = "Field Reference",
+			locator1 = "TextInput#GENERIC_TEXT_INPUT",
+			value1 = "${fieldReference}");
+
+		Click(locator1 = "Sidebar#BACK");
 	}
 
 	macro editFieldReference {
