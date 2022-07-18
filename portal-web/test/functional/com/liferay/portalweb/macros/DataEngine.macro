@@ -915,6 +915,13 @@ definition {
 				key_text = "${fieldsGroupLabel}",
 				locator1 = "Icon#ANY_VERTICAL_ELLIPSIS");
 		}
+		else if (isSet(fieldsGroupLabel)) {
+			Click(locator1 = "DataEngineBuilder#FIELD_BODY");
+
+			Click(
+				key_text = "${fieldsGroupLabel}",
+				locator1 = "Icon#ANY_VERTICAL_ELLIPSIS");
+		}
 
 		MenuItem.click(menuItem = "Duplicate");
 	}
