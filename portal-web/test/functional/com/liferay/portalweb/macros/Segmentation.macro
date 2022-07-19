@@ -110,6 +110,13 @@ definition {
 			value1 = "${textValue}");
 	}
 
+	macro checkSegmentationDisabledWarningUserWithoutPermission{
+		AssertTextEquals.assertPartialText(
+			locator1 = "Message#ERROR_3",
+			value1 = "administrator to enable it.");
+	}
+
+
 	macro checkSegmentationReEnableWarning {
 		AssertTextEquals.assertPartialText(
 			locator1 = "Message#ERROR_3",
