@@ -436,6 +436,46 @@ definition {
 		}
 	}
 
+	@description = "LPS-152508 - Verify that it's not possible to delete a Many-to-Many relationship from the child side"
+	@priority = "4"
+	test CannotDeleteManyToManyRelationshipFromChildSide {
+		task ("Create Custom Object") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 289",
+				objectName = "CustomObject289",
+				pluralLabelName = "Custom Objects 289");
+		}
+
+		task ("Add a relationship between a Custom Object and Native Object") {
+			Navigator.openURL();
+
+			ObjectAdmin.addObjectRelationshipViaAPI(
+				objectName_1 = "User",
+				objectName_2 = "CustomObject289",
+				relationshipLabel = "Relationship",
+				relationshipName = "relationship",
+				relationshipType = "manyToMany");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject289");
+		}
+
+		task ("Delete a Many-to-Many relationship from the child side") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 289");
+
+			ObjectAdmin.gotoRelationshipsTab();
+
+			Click(
+				key_objectLabel = "Relationship",
+				locator1 = "ObjectAdmin#OBJECT_KEBAB_MENU");
+
+			MenuItem.clickNoError(menuItem = "Delete");
+
+			ObjectAdmin.assertCannotDeleteRelationshipFromChildSideErrorMessage();
+		}
+	}
+
 	@description = "LPS-135400 - Verify it is not possible to leave the Relationship Label blank"
 	@priority = "4"
 	test CannotLeaveRelationshipLabelBlank {
