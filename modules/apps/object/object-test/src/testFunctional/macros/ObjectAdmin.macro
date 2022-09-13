@@ -723,16 +723,7 @@ definition {
 			userPassword = "${userPassword}");
 	}
 
-	macro deleteObjectEntryViaAPI {
-		JSONObject.deleteObjectEntry(
-			fieldName = "${fieldName}",
-			objectName = "${objectName}",
-			userEmailAddress = "${userEmailAddress}",
-			userPassword = "${userPassword}",
-			value = "${value}");
-	}
-
-	macro deleteObjectEntryViaUI {
+	macro deleteCustomObjectViaUI {
 		Click(
 			key_objectLabel = "${labelName}",
 			locator1 = "ObjectAdmin#OBJECT_KEBAB_MENU");
@@ -748,6 +739,15 @@ definition {
 		Click(locator1 = "Form#SIDEBAR_DELETE_FIELD_MODAL_DELETE_BUTTON");
 
 		Refresh();
+	}
+
+	macro deleteObjectEntryViaAPI {
+		JSONObject.deleteObjectEntry(
+			fieldName = "${fieldName}",
+			objectName = "${objectName}",
+			userEmailAddress = "${userEmailAddress}",
+			userPassword = "${userPassword}",
+			value = "${value}");
 	}
 
 	macro deleteObjectField {
