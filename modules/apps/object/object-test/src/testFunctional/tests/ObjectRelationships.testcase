@@ -528,7 +528,7 @@ definition {
 
 			MenuItem.clickNoError(menuItem = "Delete");
 
-			ObjectAdmin.assertCannotDeleteRelationshipFromChildSideErrorMessage();
+			ObjectAdmin.assertCannotDeleteRelationshipErrorMessage();
 		}
 	}
 
