@@ -2275,6 +2275,7 @@ definition {
 	@description = "This is a use case for LPS-64305 and LPS-96253."
 	@priority = "4"
 	test ViewDefaultFieldNamesWithPunctuationCharacters {
+		property forms.functional = "test";
 		property portal.acceptance = "true";
 		property portal.upstream = "true";
 		property test.assert.javascript.errors = "true";
@@ -2328,6 +2329,8 @@ definition {
 		FormFields.editText(
 			fieldName = "${textFieldName2}",
 			fieldValue = ",-+!@#$%^*()=.?/;:{}[]\|");
+
+		AssertConsoleTextNotPresent(value1 = "java.lang.NullPointerException");
 
 		FormPortlet.submitSuccessfully();
 	}
