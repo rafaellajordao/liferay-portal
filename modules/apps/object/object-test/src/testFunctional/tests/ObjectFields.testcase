@@ -1101,6 +1101,62 @@ definition {
 		}
 	}
 
+	@description = "LPS-156704 - Verify that the user is not able to order the object entry's table by the aggregation field column"
+	@priority = "4"
+	test CanNotOrderByAggregationFieldColumn {
+		task ("Create Custom Object and Custom Relationship with Account (via API)") {
+			ObjectAdmin.addObjectViaAPI(
+				labelName = "Custom Object 161891",
+				objectName = "CustomObject161891",
+				pluralLabelName = "Custom Objects 161891");
+
+			ObjectAdmin.addObjectRelationshipViaAPI(
+				objectName_1 = "CustomObject161891",
+				objectName_2 = "AccountEntry",
+				relationshipLabel = "RelationshipAccount",
+				relationshipName = "relationshipAccount",
+				relationshipType = "oneToMany");
+
+			ObjectAdmin.addObjectFieldViaAPI(
+				fieldBusinessType = "Text",
+				fieldLabelName = "Custom Text Field",
+				fieldName = "customTextField",
+				fieldType = "String",
+				isRequired = "false",
+				objectName = "CustomObject161891");
+
+			ObjectAdmin.publishObjectViaAPI(objectName = "CustomObject161891");
+		}
+
+		task ("Go to Custom Object > Fields tab and add Custom Aggregation Field (via UI)") {
+			ObjectAdmin.openObjectAdmin();
+
+			ObjectPortlet.selectCustomObject(label = "Custom Object 161891");
+
+			ObjectAdmin.goToFieldsTab();
+
+			ObjectAdmin.addObjectFieldViaUI(
+				field = "ID",
+				fieldLabel = "Custom Aggregation",
+				fieldType = "Aggregation",
+				function = "Max",
+				relationship = "RelationshipAccount");
+		}
+
+		task ("Go to Custom Object > Add entry and Assert the sort button is not present") {
+			ObjectAdmin.addObjectSingleFieldEntryViaAPI(
+				fieldName = "customTextField",
+				objectName = "CustomObject161891",
+				value = "Test Entry");
+
+			ObjectAdmin.goToCustomObject(objectName = "CustomObject161891");
+
+			AssertElementNotPresent(
+				key_orderColumn = "Custom Aggregation",
+				locator1 = "ObjectPortlet#ARROW_ORDER_COLUMN");
+		}
+	}
+
 	@description = "LPS-146889 - Verify that when turn on the 'Set the Maximum Number of Characters' the user is not allowed to type any value outside the informed range on the help text"
 	@priority = "4"
 	test CannotTypeValueOutsideRange {
