@@ -748,7 +748,7 @@ definition {
 
 		task ("Adding vocabulary and category") {
 			JSONCategory.addVocabulary(
-				groupName = "Test Site Name",
+				groupName = "Test Site Name",   
 				title = "Vocabulary Name");
 
 			var categoryId = JSONCategory.addCategory(
