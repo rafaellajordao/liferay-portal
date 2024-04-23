@@ -59,4 +59,59 @@ test.describe('Manage object fields through Model Builder', () => {
 			ListTypeDefinition.id
 		);
 	});
+
+	test('can delete object field', async ({
+		apiHelpers,
+		modelBuilderPage,
+		page,
+		viewObjectDefinitionsPage,
+	}) => {
+		await page.goto('/');
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition('default');
+
+		await viewObjectDefinitionsPage.goto();
+
+		await viewObjectDefinitionsPage.openObjectFolder('default');
+
+		await viewObjectDefinitionsPage.viewInModelBuilder();
+
+		await modelBuilderPage.leftSidebarItems
+			.filter({hasText: objectDefinition.name})
+			.click();
+
+		await modelBuilderPage.createObjectField({
+			mandatory: false,
+			objectDefinitionName: objectDefinition.name,
+			objectFieldBusinessType: 'Integer',
+			objectFieldLabel: 'intField',
+		});
+
+		await modelBuilderPage.leftSidebarItems
+			.filter({hasText: objectDefinition.name})
+			.click();
+
+		await(
+            modelBuilderPage.objectDefinitionNodes
+                .filter({hasText: objectDefinition.name})
+                .getByText('textField')
+        ).click();
+
+		await modelBuilderPage.deleteObjectFieldButton.click();
+
+		await modelBuilderPage.modalDeleteButton.click();
+
+		await expect(
+			modelBuilderPage.objectDefinitionNodes
+                .filter({hasText: objectDefinition.name})
+                .getByText('textField')
+		).not.toBeVisible();
+
+		// Clean up
+
+		await apiHelpers.objectAdmin.deleteObjectDefinition(
+			objectDefinition.id
+		);
+	});
 });
