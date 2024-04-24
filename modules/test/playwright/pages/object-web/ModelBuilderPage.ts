@@ -20,6 +20,7 @@ export class ModelBuilderPage {
 	readonly newObjectFieldName: Locator;
 	readonly newObjectFieldSaveButton: Locator;
 	readonly newObjectFieldSelectPicklist: Locator;
+	readonly modalDeleteButton: Locator;
 	readonly modalDeleteObjectRelationshipConfirmationButton: Locator;
 	readonly modalDeleteObjectRelationshipTextField: Locator;
 	readonly newObjectRelationshipLabel: Locator;
@@ -51,6 +52,10 @@ export class ModelBuilderPage {
 		);
 		this.leftSidebarItems = page.locator(
 			'li.treeview-item div.autofit-col'
+		);
+		this.modalDeleteButton = page.locator
+			('button.btn-danger')
+			.filter({hasText: 'Delete'}
 		);
 		this.modalDeleteObjectRelationshipConfirmationButton = page.getByRole(
 			'button',
