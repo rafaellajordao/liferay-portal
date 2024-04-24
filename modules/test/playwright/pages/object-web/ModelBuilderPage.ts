@@ -11,6 +11,7 @@ import {ViewObjectDefinitionsPage} from './ViewObjectDefinitionsPage';
 export class ModelBuilderPage {
 	readonly addObjectFieldButton: Locator;
 	readonly createNewObjectDefinitionButton: Locator;
+	readonly deleteObjectFieldButton: Locator;
 	readonly deleteObjectRelationshipButton: Locator;
 	readonly fitViewButton: Locator;
 	readonly leftSidebarItems: Locator;
@@ -39,6 +40,9 @@ export class ModelBuilderPage {
 		});
 		this.createNewObjectDefinitionButton =
 			page.getByText('Create New Object');
+		this.deleteObjectFieldButton = page.getByTitle(
+			'Delete'
+		);
 		this.deleteObjectRelationshipButton = page.getByLabel(
 			'Delete Relationship'
 		);
