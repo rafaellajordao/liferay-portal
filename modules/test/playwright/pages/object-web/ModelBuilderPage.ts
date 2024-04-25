@@ -19,6 +19,7 @@ export class ModelBuilderPage {
 	readonly newObjectFieldName: Locator;
 	readonly newObjectFieldSaveButton: Locator;
 	readonly newObjectFieldSelectPicklist: Locator;
+	readonly modalDeleteObjectDefinitionTextField: Locator;
 	readonly modalDeleteObjectRelationshipConfirmationButton: Locator;
 	readonly modalDeleteObjectRelationshipTextField: Locator;
 	readonly newObjectRelationshipLabel: Locator;
@@ -29,10 +30,24 @@ export class ModelBuilderPage {
 	readonly objectRelationshipEdges: Locator;
 	readonly otherObjectFolders: Locator;
 	readonly page: Page;
+	readonly showActionsDropdownItem: Locator;
 	readonly toggleSidebarsButton: Locator;
 	readonly viewObjectDefinitionsPage: ViewObjectDefinitionsPage;
 
+	// LEMBRA DE EXCLUI ISSO
+	readonly modalDeleteButton: Locator;
+
 	constructor(page: Page) {
+
+
+		// LEMBRA DE EXCLUI ISSO
+		this.modalDeleteButton = page
+			.locator('button.btn-danger')
+			.filter({hasText: 'Delete'});
+
+
+
+
 		this.addObjectFieldButton = page.getByRole('menuitem', {
 			exact: true,
 			name: 'Add Field',
@@ -47,6 +62,9 @@ export class ModelBuilderPage {
 		);
 		this.leftSidebarItems = page.locator(
 			'li.treeview-item div.autofit-col'
+		);
+		this.modalDeleteObjectDefinitionTextField = page.getByPlaceholder(
+			'Confirm Object Definition Name'
 		);
 		this.modalDeleteObjectRelationshipConfirmationButton = page.getByRole(
 			'button',
@@ -92,6 +110,8 @@ export class ModelBuilderPage {
 			.getByRole('region')
 			.filter({has: page.getByTitle('Go to Folder')});
 		this.page = page;
+		this.showActionsDropdownItem = page
+			.getByRole('menuitem');
 		this.toggleSidebarsButton = page.getByLabel('Toggle Sidebars');
 	}
 
@@ -107,6 +127,22 @@ export class ModelBuilderPage {
 		this.objectRelationshipEdges
 			.filter({hasText: objectRelationshipLabel})
 			.click();
+	}
+	async clickObjectDefinitionShowActionsButton(
+		objectDefinitionName: string
+	) {
+		await this.objectDefinitionNodes
+			.filter({hasText: objectDefinitionName})
+			.getByRole('button', {name: 'Show Actions'})
+			.click();
+	}
+
+	async clickObjectDefinitionShowActionsItem(
+		actionsItem: string,
+	) {
+		await this.showActionsDropdownItem
+		.filter({hasText: actionsItem})
+		.click();
 	}
 
 	async clickObjectDefinitionShowAllFieldsButton(

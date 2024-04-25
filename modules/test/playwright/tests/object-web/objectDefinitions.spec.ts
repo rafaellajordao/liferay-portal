@@ -88,4 +88,44 @@ test.describe('Manage object definitions through Model Builder', () => {
 			objectDefinition.id
 		);
 	});
+
+	test('delete object via objects card', async ({
+		apiHelpers,
+		modelBuilderPage,
+		viewObjectDefinitionsPage,
+	}) => {
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition('default');
+
+		await viewObjectDefinitionsPage.goto();
+
+		await viewObjectDefinitionsPage.viewInModelBuilder();
+
+		await modelBuilderPage.leftSidebarItems
+			.filter({hasText: objectDefinition.name})
+			.click();
+
+		await modelBuilderPage.clickObjectDefinitionShowActionsButton(objectDefinition.name);
+
+		await modelBuilderPage.clickObjectDefinitionShowActionsItem('Delete Object');
+
+		await modelBuilderPage.modalDeleteObjectDefinitionTextField.click();
+		
+		await modelBuilderPage.modalDeleteObjectDefinitionTextField.fill(
+			objectDefinition.name
+		);
+		
+		await modelBuilderPage.modalDeleteButton.click();
+
+		await expect(
+			modelBuilderPage.objectDefinitionNodes.filter({
+				hasText: objectDefinition.name})
+		).not.toBeVisible();
+
+		// Clean up
+
+		await apiHelpers.objectAdmin.deleteObjectDefinition(
+			objectDefinition.id
+		);
+	});
 });
