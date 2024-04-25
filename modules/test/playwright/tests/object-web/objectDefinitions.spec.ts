@@ -117,4 +117,63 @@ test.describe('Manage object definitions through Model Builder', () => {
 			objectDefinition.id
 		);
 	});
+
+	test('see object definition details', async ({
+		apiHelpers,
+		modelBuilderPage,
+	}) => {
+
+		const objectDefinition =
+			await apiHelpers.objectAdmin.postRandomObjectDefinition('default');
+		
+		await modelBuilderPage.goto({objectFolderName: 'Default'});
+
+		await expect(modelBuilderPage.leftSidebarItems
+			.filter({hasText: objectDefinition.name}))
+			.toBeVisible();
+
+		await modelBuilderPage.leftSidebarItems
+			.filter({hasText: objectDefinition.name})
+			.click();
+
+		await expect(modelBuilderPage.objectDefinitionNodes
+			.filter({hasText: objectDefinition.name}))
+			.toBeVisible();
+
+		await expect(
+			modelBuilderPage.rightSidebar.getByTitle(
+				objectDefinition.name + ' Details'
+			)
+		).toBeVisible();
+
+		await expect(
+			modelBuilderPage.rightSidebar
+			.filter({hasText: 'Label'})
+			.filter({hasText: objectDefinition.name})
+		).toBeVisible();
+
+		await expect(
+			modelBuilderPage.rightSidebar
+			.filter({hasText: 'Plural Label'})
+			.filter({hasText: objectDefinition.name})
+		).toBeVisible();
+
+		await expect(
+			modelBuilderPage.rightSidebar
+			.filter({hasText: objectDefinition.name})
+			.filter({hasText: 'Table Name'})
+		).toBeVisible();
+
+		await expect(
+			modelBuilderPage.rightSidebar
+			.filter({hasText: objectDefinition.name})
+			.filter({hasText: 'Activate Object'})
+		).toBeVisible();
+
+		// Clean up
+
+		// await apiHelpers.objectAdmin.deleteObjectDefinition(
+		// 	objectDefinition.id
+		// );
+	});
 });
