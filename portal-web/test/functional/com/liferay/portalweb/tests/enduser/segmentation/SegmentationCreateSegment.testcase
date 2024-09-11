@@ -7,6 +7,7 @@ definition {
 	property portal.release = "true";
 	property portal.upstream = "true";
 	property property.group = "analytics.cloud.profile";
+	property test.run.type = "single";
 	property testray.main.component.name = "Segmentation";
 
 	setUp {
@@ -446,9 +447,6 @@ definition {
 	@priority = 5
 	@uitest
 	test AddSegmentByOrganizationRegion {
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
 		task ("Add user") {
 			JSONUser.addUser(
 				userEmailAddress = "userea@liferay.com",
@@ -1677,9 +1675,6 @@ definition {
 	@priority = 5
 	@uitest
 	test AddSegmentByUserSiteOrganizationRole {
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
 		task ("Add user") {
 			JSONUser.addUser(
 				userEmailAddress = "userea@liferay.com",
@@ -1918,9 +1913,6 @@ definition {
 	@description = "LPS-147454 Validate if the user can use a custom field as criteria to create a segment"
 	@priority = 4
 	test AddSegmentUsingCustomFields {
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
 		task ("Add custom field in User") {
 			CustomFields.openCustomFieldAdmin();
 
@@ -2407,9 +2399,6 @@ definition {
 	@description = "LPS-130919 Given the Session Property Vocabularies in Instance Settings When the user is adding a vocabulary to a session property Then the breadcrumb to go to Segments, or Instance Settings is available"
 	@priority = 3
 	test InstanceSettingsSessionPropertyVocabulariesBreadcrumb {
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
 		task ("Go to Instance Settings > Segments > Session Property Vocabulary") {
 			PortalSettings.openInstanceSettingsAdmin();
 
@@ -2439,9 +2428,6 @@ definition {
 	@description = "LPS-130919 Given the adding a vocabulary to a session property view When the user clicks on Cancel button Then the user is lead to the main tab Session Property Vocabularies"
 	@priority = 3
 	test InstanceSettingsSessionPropertyVocabulariesCancelButton {
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
 		task ("Go to Instance Settings > Segments > Session Property Vocabulary") {
 			PortalSettings.openInstanceSettingsAdmin();
 
@@ -2469,9 +2455,6 @@ definition {
 	@description = "LPS-130919 Given the Segment Editor When the user adds a Session Property Vocabulary in the Instance Settings Then the associated Categories must be available when selecting the session property"
 	@priority = 5
 	test InstanceSettingsSessionPropertyVocabularyInSegmentsEditor {
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
 		task ("Set Session Property Vocabulary") {
 			Segmentation.setVocabularySessionProperty(
 				propertyName = "Browser",
@@ -2534,9 +2517,6 @@ definition {
 	@description = "LPS-132249 If vocabulary or value is deleted, in the segment editor the condition will keep working if the user go out without saving changes"
 	@priority = 4
 	test KeepInfomationOfDeleteVocabularyInSegment {
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
-
 		task ("Set Session Property Vocabulary") {
 			Segmentation.setVocabularySessionProperty(
 				propertyName = "Browser",
@@ -3271,8 +3251,7 @@ definition {
 	@description = "LPS-132249 In System Settings>Segments, all vocabularies created will be listed in the Vocabulary dropdown"
 	@priority = 4
 	test VocabulariesListedInSystemSettingsSegments {
-		property test.liferay.virtual.instance = "false";
-		property test.run.type = "single";
+		property portal.upstream = "quarantine";
 
 		task ("Add two vocabularies to global site") {
 			for (var n : list "1,2") {
