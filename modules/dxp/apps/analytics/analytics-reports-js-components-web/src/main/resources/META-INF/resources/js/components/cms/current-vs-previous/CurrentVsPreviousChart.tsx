@@ -159,7 +159,7 @@ export interface IMetricsChartLegendProps {
 	onDatakeyChange: (dataKey: string | null) => void;
 }
 
-interface ICurrentVsPreviousChartProps {
+export interface ICurrentVsPreviousChartProps {
 	data: Data;
 	metricType: MetricType;
 }
