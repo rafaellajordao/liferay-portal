@@ -51,8 +51,8 @@ const ContentAndFilesCard: React.FC<IContentAndFilesCard> = ({
 
 	const queryParams = buildQueryString(
 		{
+			depotEntryId: space.value,
 			languageId: language.value,
-			spaceId: space.value,
 			...getSafeRangeSelector(rangeSelector),
 		},
 		{
