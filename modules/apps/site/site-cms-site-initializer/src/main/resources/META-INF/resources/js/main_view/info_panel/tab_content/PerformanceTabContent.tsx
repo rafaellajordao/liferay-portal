@@ -19,7 +19,7 @@ const PerformanceTab = () => {
 	return (
 		<CMSPerformance
 			assetId={selectedAsset?.id}
-			spaceId={selectedAsset?.objectEntries?.[0]?.embedded.scopeId}
+			depotEntryId={selectedAsset?.objectEntries?.[0]?.embedded.scopeId}
 		/>
 	);
 };

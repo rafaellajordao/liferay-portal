@@ -14,13 +14,16 @@ import '../css/cms_performance.scss';
 
 interface ICMSPerformanceProps extends React.HTMLAttributes<HTMLElement> {
 	assetId?: number | null;
-	spaceId?: number | null;
+	depotEntryId?: number | null;
 }
 
-const CMSPerformance: React.FC<ICMSPerformanceProps> = ({assetId, spaceId}) => {
+const CMSPerformance: React.FC<ICMSPerformanceProps> = ({
+	assetId,
+	depotEntryId,
+}) => {
 	return (
 		<div className="cms-performance">
-			<CheckPermissions spaceId={String(spaceId)}>
+			<CheckPermissions depotEntryId={String(depotEntryId)}>
 				<ContextProvider assetId={String(assetId)}>
 					<Metrics />
 

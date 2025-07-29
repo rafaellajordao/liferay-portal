@@ -32,7 +32,9 @@ describe('CheckPermissions', () => {
 			error: null,
 		});
 
-		render(<CheckPermissions spaceId="123">tab rendered</CheckPermissions>);
+		render(
+			<CheckPermissions depotEntryId="123">tab rendered</CheckPermissions>
+		);
 
 		await waitForElementToBeRemoved(() => screen.getByTestId('loading'));
 
@@ -50,7 +52,9 @@ describe('CheckPermissions', () => {
 			error: null,
 		});
 
-		render(<CheckPermissions spaceId="123">tab rendered</CheckPermissions>);
+		render(
+			<CheckPermissions depotEntryId="123">tab rendered</CheckPermissions>
+		);
 
 		await waitForElementToBeRemoved(() => screen.getByTestId('loading'));
 
@@ -76,7 +80,9 @@ describe('CheckPermissions', () => {
 			error: null,
 		});
 
-		render(<CheckPermissions spaceId="123">tab rendered</CheckPermissions>);
+		render(
+			<CheckPermissions depotEntryId="123">tab rendered</CheckPermissions>
+		);
 
 		await waitForElementToBeRemoved(() => screen.getByTestId('loading'));
 
@@ -104,7 +110,9 @@ describe('CheckPermissions', () => {
 			error: null,
 		});
 
-		render(<CheckPermissions spaceId="123">tab rendered</CheckPermissions>);
+		render(
+			<CheckPermissions depotEntryId="123">tab rendered</CheckPermissions>
+		);
 
 		await waitForElementToBeRemoved(() => screen.getByTestId('loading'));
 
@@ -130,7 +138,9 @@ describe('CheckPermissions', () => {
 			error: null,
 		});
 
-		render(<CheckPermissions spaceId="123">tab rendered</CheckPermissions>);
+		render(
+			<CheckPermissions depotEntryId="123">tab rendered</CheckPermissions>
+		);
 
 		await waitForElementToBeRemoved(() => screen.getByTestId('loading'));
 
@@ -156,7 +166,9 @@ describe('CheckPermissions', () => {
 			error: null,
 		});
 
-		render(<CheckPermissions spaceId="123">tab rendered</CheckPermissions>);
+		render(
+			<CheckPermissions depotEntryId="123">tab rendered</CheckPermissions>
+		);
 
 		await waitForElementToBeRemoved(() => screen.getByTestId('loading'));
 
@@ -180,7 +192,9 @@ describe('CheckPermissions', () => {
 			error: null,
 		});
 
-		render(<CheckPermissions spaceId="123">tab rendered</CheckPermissions>);
+		render(
+			<CheckPermissions depotEntryId="123">tab rendered</CheckPermissions>
+		);
 
 		await waitForElementToBeRemoved(() => screen.getByTestId('loading'));
 
