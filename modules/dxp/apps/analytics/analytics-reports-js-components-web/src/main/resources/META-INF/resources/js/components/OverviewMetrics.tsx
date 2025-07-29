@@ -3,17 +3,21 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
+import ClayLoadingIndicator from '@clayui/loading-indicator';
 import React, {useContext, useEffect} from 'react';
 
-import {AnalyticsReportsContext} from '../AnalyticsReportsContext';
-import {AssetMetricProps, fetchAssetMetric} from '../apis/analytics-reports';
-import OverviewMetric, {
-	TrendClassification,
-} from '../components/OverviewMetric';
+import {Context} from '../Context';
+import OverviewMetric from '../components/OverviewMetric';
 import useFetch from '../hooks/useFetch';
-import {AssetTypes, MetricType} from '../types/global';
-import {assetMetrics} from '../utils/metrics';
-import StateRenderer from './StateRenderer';
+import {
+	AssetTypes,
+	Individuals,
+	MetricName,
+	MetricType,
+	RangeSelectors,
+} from '../types/global';
+import {buildQueryString} from '../utils/buildQueryString';
+import {TrendClassification, assetMetrics} from '../utils/metrics';
 
 type MetricData = {
 	metricType: MetricType;
@@ -38,9 +42,9 @@ type Metrics = {
 export const MetricsTitle: Metrics = {
 	[MetricType.Comments]: Liferay.Language.get('comments'),
 	[MetricType.Downloads]: Liferay.Language.get('downloads'),
-	[MetricType.Previews]: Liferay.Language.get('previews'),
-	[MetricType.Views]: Liferay.Language.get('views'),
+	[MetricType.Impressions]: Liferay.Language.get('impressions'),
 	[MetricType.Undefined]: Liferay.Language.get('undefined'),
+	[MetricType.Views]: Liferay.Language.get('views'),
 };
 
 interface IOverviewMetricsWithDataProps {
@@ -50,10 +54,10 @@ interface IOverviewMetricsWithDataProps {
 const OverviewMetricsWithData: React.FC<IOverviewMetricsWithDataProps> = ({
 	data,
 }) => {
-	const {changeMetricFilter, filters} = useContext(AnalyticsReportsContext);
+	const {changeMetricFilter, filters} = useContext(Context);
 
 	useEffect(() => {
-		if (!filters.metric) {
+		if (filters.metric === MetricType.Undefined) {
 			changeMetricFilter(data.defaultMetric.metricType);
 		}
 	}, [changeMetricFilter, data.defaultMetric.metricType, filters.metric]);
@@ -77,31 +81,37 @@ const OverviewMetricsWithData: React.FC<IOverviewMetricsWithDataProps> = ({
 	);
 };
 
+export type AssetMetricProps = {
+	assetId: string;
+	assetType: string;
+	groupId: string;
+	individual: Individuals;
+	rangeSelector: RangeSelectors;
+	selectedMetrics: MetricName[];
+};
+
 const OverviewMetrics = () => {
-	const {assetId, assetType, filters, groupId} = useContext(
-		AnalyticsReportsContext
+	const {assetId, assetType, filters, groupId} = useContext(Context);
+	const queryString = buildQueryString({
+		assetId,
+		identityType: filters.individual,
+		rangeKey: filters.rangeSelector,
+		selectedMetric: String(assetMetrics[assetType]),
+	});
+
+	const {data, loading} = useFetch<Data>(
+		`/o/analytics-reports-rest/v1.0/${groupId}/asset-metrics/${assetType}${queryString}`
 	);
 
-	const {data, error, loading} = useFetch<Data, AssetMetricProps>(
-		fetchAssetMetric,
-		{
-			variables: {
-				assetId,
-				assetType: assetType || AssetTypes.Undefined,
-				groupId,
-				individual: filters.individual,
-				rangeSelector: filters.rangeSelector,
-				selectedMetrics:
-					assetMetrics[assetType || AssetTypes.Undefined],
-			},
-		}
-	);
+	if (loading) {
+		return <ClayLoadingIndicator className="my-5" />;
+	}
 
-	return (
-		<StateRenderer data={data} error={error} loading={loading}>
-			{({data}) => <OverviewMetricsWithData data={data} />}
-		</StateRenderer>
-	);
+	if (!data) {
+		return null;
+	}
+
+	return <OverviewMetricsWithData data={data} />;
 };
 
 export default OverviewMetrics;

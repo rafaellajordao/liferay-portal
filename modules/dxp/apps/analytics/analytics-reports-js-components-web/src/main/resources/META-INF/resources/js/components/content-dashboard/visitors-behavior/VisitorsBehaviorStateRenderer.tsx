@@ -5,9 +5,8 @@
 
 import React, {useContext} from 'react';
 
-import {AnalyticsReportsContext} from '../../AnalyticsReportsContext';
-import {MetricType} from '../../types/global';
-import {metricNameByType} from '../../utils/metrics';
+import {Context} from '../../../Context';
+import {metricNameByType} from '../../../utils/metrics';
 import {Data, PublishedVersionData} from './VisitorsBehavior';
 import VisitorsBehaviorChart from './VisitorsBehaviorChart';
 import {
@@ -24,13 +23,12 @@ interface IVisitorsBehaviorStateRendererProps {
 const VisitorsBehaviorStateRenderer: React.FC<
 	IVisitorsBehaviorStateRendererProps
 > = ({data}) => {
-	const {filters, versions} = useContext(AnalyticsReportsContext);
+	const {filters, versions} = useContext(Context);
 
 	let publishedVersionData: PublishedVersionData | null = null;
 	let dates: {date: string; version: string}[] = [];
 
-	const metricName =
-		metricNameByType[filters?.metric || MetricType.Undefined];
+	const metricName = metricNameByType[filters.metric];
 
 	const selectedHistogram = getSelectedHistogram(data, metricName);
 
