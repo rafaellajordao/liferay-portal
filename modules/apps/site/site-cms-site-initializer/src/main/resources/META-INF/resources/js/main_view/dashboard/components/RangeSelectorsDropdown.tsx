@@ -36,8 +36,12 @@ export type RangeSelector = {
 
 export interface IRangeSelectorsDropdown {
 	activeRangeSelector: RangeSelector;
+	availableRangeKeys?: RangeSelectors[];
 	className?: string;
 	onChange: (rangeSelector: RangeSelector) => void;
+	showCustomRange?: boolean;
+	showDescription?: boolean;
+	showIcon?: boolean;
 }
 
 const LAST_24_HOURS = {
@@ -73,18 +77,41 @@ const LAST_90_DAYS = {
 	value: RangeSelectors.Last90Days,
 };
 
+const buildRangeSelectors = (showDescription = true): Item[] => [
+	{
+		...LAST_24_HOURS,
+		description: showDescription ? LAST_24_HOURS.description : undefined,
+	},
+	{
+		...LAST_7_DAYS,
+		description: showDescription ? LAST_7_DAYS.description : undefined,
+	},
+	{
+		...LAST_28_DAYS,
+		description: showDescription ? LAST_28_DAYS.description : undefined,
+	},
+	{
+		...LAST_30_DAYS,
+		description: showDescription ? LAST_30_DAYS.description : undefined,
+	},
+	{
+		...LAST_90_DAYS,
+		description: showDescription ? LAST_90_DAYS.description : undefined,
+	},
+];
+
 interface IView {
 	activeRangeSelector: RangeSelector;
+	availableRangeSelectors: Item[];
 	onActiveChange: (active: boolean) => void;
 	onChange: (rangeSelector: RangeSelector) => void;
 	onViewChange: (view: View) => void;
+	showCustomRange?: boolean;
 }
 
-const CustomRangeView: React.FC<IView> = ({
-	onActiveChange,
-	onChange,
-	onViewChange,
-}) => {
+const CustomRangeView: React.FC<
+	Omit<IView, 'availableRangeSelectors' | 'showCustomRange'>
+> = ({onActiveChange, onChange, onViewChange}) => {
 	const [rangeStart, setRangeStart] = useState('');
 	const [rangeEnd, setRangeEnd] = useState('');
 
@@ -173,23 +200,17 @@ const CustomRangeView: React.FC<IView> = ({
 	);
 };
 
-const rangeSelectors: Item[] = [
-	LAST_24_HOURS,
-	LAST_7_DAYS,
-	LAST_28_DAYS,
-	LAST_30_DAYS,
-	LAST_90_DAYS,
-];
-
 const DefaultView: React.FC<IView> = ({
 	activeRangeSelector,
+	availableRangeSelectors,
 	onActiveChange,
 	onChange,
 	onViewChange,
+	showCustomRange,
 }) => {
 	return (
 		<>
-			{rangeSelectors.map((item) => (
+			{availableRangeSelectors.map((item) => (
 				<ClayDropdown.Item
 					active={item.value === activeRangeSelector.rangeKey}
 					data-testid={`range-selector-dropdown-item-${item.value}`}
@@ -223,19 +244,24 @@ const DefaultView: React.FC<IView> = ({
 				</ClayDropdown.Item>
 			))}
 
-			<ClayDropdown.Item
-				onClick={() => onViewChange(View.CustomRange)}
-				symbolLeft={
-					activeRangeSelector.rangeKey === RangeSelectors.CustomRange
-						? 'check'
-						: ''
-				}
-				symbolRight="angle-right"
-			>
-				<div>
-					<Text size={4}>{Liferay.Language.get('custom-range')}</Text>
-				</div>
-			</ClayDropdown.Item>
+			{showCustomRange && (
+				<ClayDropdown.Item
+					onClick={() => onViewChange(View.CustomRange)}
+					symbolLeft={
+						activeRangeSelector.rangeKey ===
+						RangeSelectors.CustomRange
+							? 'check'
+							: ''
+					}
+					symbolRight="angle-right"
+				>
+					<div>
+						<Text size={4}>
+							{Liferay.Language.get('custom-range')}
+						</Text>
+					</div>
+				</ClayDropdown.Item>
+			)}
 		</>
 	);
 };
@@ -247,11 +273,22 @@ const Views = {
 
 const RangeSelectorsDropdown: React.FC<IRangeSelectorsDropdown> = ({
 	activeRangeSelector,
+	availableRangeKeys,
 	className,
 	onChange,
+	showCustomRange = true,
+	showDescription = true,
+	showIcon = false,
 }) => {
 	const [dropdownActive, setDropdownActive] = useState(false);
 	const [view, setView] = useState<View>(View.Default);
+
+	const allSelectors = buildRangeSelectors(showDescription);
+	const filteredSelectors = availableRangeKeys
+		? allSelectors.filter((item) =>
+				availableRangeKeys.includes(item.value as RangeSelectors)
+			)
+		: allSelectors;
 
 	const triggerLabel = () => {
 		if (activeRangeSelector.rangeKey === RangeSelectors.CustomRange) {
@@ -259,7 +296,7 @@ const RangeSelectorsDropdown: React.FC<IRangeSelectorsDropdown> = ({
 		}
 
 		return (
-			rangeSelectors.find(
+			filteredSelectors.find(
 				({value}) => value === activeRangeSelector.rangeKey
 			)?.label ?? ''
 		);
@@ -283,7 +320,11 @@ const RangeSelectorsDropdown: React.FC<IRangeSelectorsDropdown> = ({
 					displayType="secondary"
 					size="sm"
 				>
-					<span className="ml-2 range-selector-dropdown__trigger-label">
+					<span className="align-items-center d-flex ml-2 range-selector-dropdown__trigger-label">
+						{showIcon && (
+							<ClayIcon className="mr-2" symbol="date" />
+						)}
+
 						{triggerLabel()}
 
 						<ClayIcon className="ml-2" symbol="caret-bottom" />
@@ -293,9 +334,11 @@ const RangeSelectorsDropdown: React.FC<IRangeSelectorsDropdown> = ({
 		>
 			<ViewComponent
 				activeRangeSelector={activeRangeSelector}
+				availableRangeSelectors={filteredSelectors}
 				onActiveChange={setDropdownActive}
 				onChange={onChange}
 				onViewChange={setView}
+				showCustomRange={showCustomRange}
 			/>
 		</ClayDropdown>
 	);
