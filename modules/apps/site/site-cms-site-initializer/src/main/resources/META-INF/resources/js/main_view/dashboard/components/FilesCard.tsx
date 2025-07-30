@@ -29,8 +29,15 @@ export function FilesCard() {
 				<>
 					<RangeSelectorsDropdown
 						activeRangeSelector={rangeSelector}
+						availableRangeKeys={[
+							RangeSelectors.Last7Days,
+							RangeSelectors.Last30Days,
+						]}
 						className="mr-3"
 						onChange={setRangeSelector}
+						showCustomRange={false}
+						showDescription={false}
+						showIcon={true}
 					/>
 
 					<ActionsDropdown
