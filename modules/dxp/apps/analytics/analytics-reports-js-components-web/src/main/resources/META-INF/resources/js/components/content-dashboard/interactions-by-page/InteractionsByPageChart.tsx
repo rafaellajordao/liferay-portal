@@ -182,7 +182,7 @@ const InteractionsByPageChart: React.FC<IInteractionsByPageChartProps> = ({
 						formattedData.combinedData[0]?.[
 							InteractionsByPageDataKey.AxisX
 						] as number,
-						filters.rangeSelector
+						filters.rangeSelector.rangeKey
 					)
 				)}
 				data-testid="interactions-by-page-chart-data"

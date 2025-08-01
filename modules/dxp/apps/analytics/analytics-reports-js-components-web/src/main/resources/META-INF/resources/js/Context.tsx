@@ -6,23 +6,21 @@
 import React, {createContext, useReducer} from 'react';
 
 import {
-	AssetTypes,
-	Individuals,
-	MetricType,
+	RangeSelector,
 	RangeSelectors,
-	Version,
-} from './types/global';
+} from './components/RangeSelectorsDropdown';
+import {AssetTypes, Individuals, MetricType, Version} from './types/global';
 
 export type State = {
 	assetId: string;
 	assetType: AssetTypes;
 	changeIndividualFilter: (value: any) => void;
 	changeMetricFilter: (value: any) => void;
-	changeRangeSelectorFilter: (value: any) => void;
+	changeRangeSelectorFilter: (value: RangeSelector) => void;
 	filters: {
 		individual: Individuals;
 		metric: MetricType;
-		rangeSelector: RangeSelectors;
+		rangeSelector: RangeSelector;
 	};
 	groupId: string;
 	versions?: Version[] | null;
@@ -48,7 +46,11 @@ const initialState: State = {
 	filters: {
 		individual: Individuals.AllIndividuals,
 		metric: MetricType.Undefined,
-		rangeSelector: RangeSelectors.Last30Days,
+		rangeSelector: {
+			rangeEnd: '',
+			rangeKey: RangeSelectors.Last7Days,
+			rangeStart: '',
+		},
 	},
 	groupId: '0',
 	versions: null,

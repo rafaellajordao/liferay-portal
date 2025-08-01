@@ -7,11 +7,11 @@ import React from 'react';
 
 import {ContextProvider} from './Context';
 import {CheckPermissions} from './components/cms/CheckPermissions';
+import GlobalFilters from './components/cms/GlobalFilters';
 import {Metrics} from './components/cms/Metrics';
 import {AssetMetrics} from './components/cms/asset-metrics/AssetMetrics';
 
 import '../css/cms_performance.scss';
-
 interface ICMSPerformanceProps extends React.HTMLAttributes<HTMLElement> {
 	assetId?: number | null;
 	depotEntryId?: number | null;
@@ -25,6 +25,8 @@ const CMSPerformance: React.FC<ICMSPerformanceProps> = ({
 		<div className="cms-performance">
 			<CheckPermissions depotEntryId={String(depotEntryId)}>
 				<ContextProvider assetId={String(assetId)}>
+					<GlobalFilters />
+
 					<Metrics />
 
 					<AssetMetrics />

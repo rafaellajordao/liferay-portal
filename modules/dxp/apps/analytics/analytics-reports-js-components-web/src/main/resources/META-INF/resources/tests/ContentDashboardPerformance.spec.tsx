@@ -12,15 +12,11 @@ import {fetch} from 'frontend-js-web';
 import React from 'react';
 
 import ContentDashboardPerformance from '../js/ContentDashboardPerformance';
-import {
-	AssetTypes,
-	Individuals,
-	MetricType,
-	RangeSelectors,
-} from '../js/types/global';
+import {AssetTypes, Individuals, MetricType} from '../js/types/global';
 
 import '@testing-library/jest-dom/extend-expect';
 
+import {RangeSelectors} from '../js/components/RangeSelectorsDropdown';
 import {TrendClassification} from '../js/utils/metrics';
 
 jest.mock('frontend-js-web', () => ({
@@ -310,7 +306,11 @@ describe('ContentDashboardPerformance Filter by RangeSelectors', () => {
 
 		fireEvent.click(rangeSelectorsFilter);
 
-		fireEvent.click(getByTestId(`filter-item-${RangeSelectors.Last7Days}`));
+		fireEvent.click(
+			getByTestId(
+				`range-selector-dropdown-item-${RangeSelectors.Last7Days}`
+			)
+		);
 
 		expect(rangeSelectorsFilter.textContent).toEqual('last-7-days');
 	});
@@ -336,7 +336,9 @@ describe('ContentDashboardPerformance Filter by RangeSelectors', () => {
 		fireEvent.click(rangeSelectorsFilter);
 
 		fireEvent.click(
-			getByTestId(`filter-item-${RangeSelectors.Last28Days}`)
+			getByTestId(
+				`range-selector-dropdown-item-${RangeSelectors.Last28Days}`
+			)
 		);
 
 		expect(rangeSelectorsFilter.textContent).toEqual('last-28-days');
@@ -363,7 +365,9 @@ describe('ContentDashboardPerformance Filter by RangeSelectors', () => {
 		fireEvent.click(rangeSelectorsFilter);
 
 		fireEvent.click(
-			getByTestId(`filter-item-${RangeSelectors.Last30Days}`)
+			getByTestId(
+				`range-selector-dropdown-item-${RangeSelectors.Last30Days}`
+			)
 		);
 
 		expect(rangeSelectorsFilter.textContent).toEqual('last-30-days');
@@ -390,7 +394,9 @@ describe('ContentDashboardPerformance Filter by RangeSelectors', () => {
 		fireEvent.click(rangeSelectorsFilter);
 
 		fireEvent.click(
-			getByTestId(`filter-item-${RangeSelectors.Last90Days}`)
+			getByTestId(
+				`range-selector-dropdown-item-${RangeSelectors.Last90Days}`
+			)
 		);
 
 		expect(rangeSelectorsFilter.textContent).toEqual('last-90-days');

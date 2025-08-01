@@ -3,16 +3,16 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-import '@testing-library/jest-dom/extend-expect';
-import {fireEvent, render, screen} from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
-
 import {
 	IRangeSelectorsDropdown,
 	RangeSelectors,
 	RangeSelectorsDropdown,
-} from '../../../../src/main/resources/META-INF/resources/js/main_view/dashboard/components/RangeSelectorsDropdown';
+} from '@liferay/analytics-reports-js-components-web';
+
+import '@testing-library/jest-dom/extend-expect';
+import {fireEvent, render, screen} from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 describe('[CMS Dashboard] Components: RangeSelectorsDropdown', () => {
 	const mockedOnChange = jest.fn();
@@ -23,6 +23,14 @@ describe('[CMS Dashboard] Components: RangeSelectorsDropdown', () => {
 			rangeStart: '',
 		},
 		onChange: mockedOnChange,
+		availableRangeKeys: [
+			RangeSelectors.Last24Hours,
+			RangeSelectors.Last7Days,
+			RangeSelectors.Last28Days,
+			RangeSelectors.Last30Days,
+			RangeSelectors.Last90Days,
+			RangeSelectors.CustomRange,
+		],
 	};
 
 	it('renders correctly with different date range options', () => {
