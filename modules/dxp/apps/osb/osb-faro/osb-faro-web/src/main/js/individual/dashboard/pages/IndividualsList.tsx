@@ -19,8 +19,10 @@ import {
 	ProfileTypes,
 	RelationalOperators
 } from 'segment/segment-editor/dynamic/utils/constants';
-import {FilterOptionType} from 'shared/types';
+import {FilterByType, FilterOptionType, RangeSelectors} from 'shared/types';
+import {getSafeRangeSelectors} from 'shared/util/util';
 import {IndividualsListCDPColumns} from 'shared/util/table-columns';
+import {Map, Set} from 'immutable';
 import {Sizes} from 'shared/util/constants';
 import {useParams} from 'react-router-dom';
 import {useRequest} from 'shared/hooks/useRequest';
@@ -67,6 +69,20 @@ const DEFAULT_FILTER_BY_OPTIONS: FilterOptionType[] = [
 				value: ProfileTypes.ANONYMOUS
 			}
 		]
+	},
+	{
+		key: 'activityStatus',
+		label: Liferay.Language.get('activity-status'),
+		values: [
+			{
+				label: Liferay.Language.get('active'),
+				value: 'ACTIVE'
+			},
+			{
+				label: Liferay.Language.get('inactive'),
+				value: 'INACTIVE'
+			}
+		]
 	}
 ];
 
@@ -90,6 +106,9 @@ const IndividualsList = () => {
 	}>();
 
 	const paginationParams = useStatefulPagination(undefined, {
+		initialFilterBy: Map({
+			activityStatus: Set(['ACTIVE'])
+		}) as FilterByType,
 		initialOrderIOMap: createOrderIOMap(NAME)
 	});
 
@@ -122,7 +141,14 @@ const IndividualsList = () => {
 		return DEFAULT_FILTER_BY_OPTIONS;
 	}, [countriesData, countriesLoading]);
 
+	const activityStatusValues =
+		paginationParams.filterBy.get('activityStatus');
+
 	const selectedFilters = {
+		activityStatus:
+			activityStatusValues?.size === 2
+				? undefined
+				: activityStatusValues?.first(),
 		filter: transformCountriesInQueryString(
 			paginationParams.filterBy.get('countries')?.toArray()
 		),
@@ -184,6 +210,7 @@ const IndividualsList = () => {
 						]}
 						dataSourceFn={API.individuals.search}
 						dataSourceParams={{
+							activityStatus: selectedFilters.activityStatus,
 							channelId,
 							filter: selectedFilters.filter,
 							groupId,
