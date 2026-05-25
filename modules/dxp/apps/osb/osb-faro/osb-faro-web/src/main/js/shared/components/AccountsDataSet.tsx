@@ -12,6 +12,11 @@ import {
 import {Routes} from 'shared/util/router';
 import {toThousands} from 'shared/util/numbers';
 
+const activityStatusItems = [
+	{label: Liferay.Language.get('active'), value: 'ACTIVE'},
+	{label: Liferay.Language.get('inactive'), value: 'INACTIVE'}
+];
+
 const lifecycleStageItems = Object.entries(lifecycleStagesLabelMap).map(
 	([stage]) => ({
 		label: lifecycleStagesLabelMap[stage as LifecycleStages].label,
@@ -20,6 +25,7 @@ const lifecycleStageItems = Object.entries(lifecycleStagesLabelMap).map(
 );
 
 interface IAccountsDataSetProps {
+	activityStatusFilter?: string;
 	apiURL: string;
 	channelId: string;
 	countryFilter?: string;
@@ -37,6 +43,7 @@ const buildSelectionPreloadedData = (value?: string, label?: string) =>
 		: undefined;
 
 const AccountsDataSet: React.FC<IAccountsDataSetProps> = ({
+	activityStatusFilter,
 	apiURL,
 	channelId,
 	countryFilter,
@@ -92,6 +99,19 @@ const AccountsDataSet: React.FC<IAccountsDataSetProps> = ({
 				}}
 				filters={[
 					{
+						id: 'activityStatus',
+						items: activityStatusItems,
+						label: Liferay.Language.get('activity-status'),
+						name: 'activityStatus',
+						preloadedData: buildSelectionPreloadedData(
+							activityStatusFilter,
+							activityStatusItems.find(
+								({value}) => value === activityStatusFilter
+							)?.label
+						),
+						type: 'selection'
+					},
+					{
 						id: 'lifecycleStatus',
 						items: lifecycleStageItems,
 						label: Liferay.Language.get('status'),
@@ -131,9 +151,13 @@ const AccountsDataSet: React.FC<IAccountsDataSetProps> = ({
 					}
 				]}
 				id='accounts-list-dataset'
-				key={`${countryFilter ?? ''}|${industryFilter ?? ''}|${
-					lifecycleStageFilter ?? ''
-				}`}
+				key={[
+					activityStatusFilter,
+					countryFilter,
+					industryFilter,
+					lifecycleStageFilter,
+					...Object.values(rangeSelectors)
+				].join()}
 				pagination={pagination}
 				showPagination
 				snapshots={snapshots}
