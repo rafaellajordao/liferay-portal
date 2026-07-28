@@ -404,7 +404,7 @@ const ProfileCard: React.FC<IProfileCardProps> = ({
 			<PaginatedVerticalTimeline
 				{...sessionsMappedResults}
 				delta={delta}
-				initialExpanded={false}
+				initialExpanded
 				LDPEnabled={LDPEnabled}
 				noResultsRenderer={renderNoResults()}
 				onDeltaChange={onDeltaChange}

@@ -1,22 +1,17 @@
 import moment from 'moment';
 import React from 'react';
 import {DEFAULT_ACTIVITY_MAX} from 'shared/api/activities';
-import {
-	flattenDepth,
-	flow,
-	groupBy,
-	map,
-	mapValues,
-	orderBy,
-	toPairs,
-} from 'lodash/fp';
 import getEventDashboardUrl, {
 	EventDashboardContext,
 } from './getEventDashboardUrl';
 import {getSafeDecodedURIComponent} from './util';
+import {
+	AssetTypes,
+	LIFERAY_DXP_APPLICATION_IDS,
+	TimeIntervals,
+} from 'shared/util/constants';
 import {RangeSelectors} from 'shared/types';
 import {sub} from 'shared/util/lang';
-import {TimeIntervals} from 'shared/util/constants';
 import {UserSession, UserSessionEvent} from 'shared/queries/UserSessionQuery';
 
 export const CHART_ACTIVITY_ID = 'activities';
@@ -28,7 +23,7 @@ export const INTERVAL_MAP = {
 	W: TimeIntervals.Week,
 };
 
-type SessionEvent = {
+export type SessionEvent = {
 	attributes: Record<string, unknown>;
 	description: string;
 	descriptionUrl?: string;
@@ -52,17 +47,36 @@ export type UserSessionAttributes = {
 
 export type VerticalTimelineHeader = {
 	header: boolean;
-	title: moment.Moment;
+	title: string;
+	totalEvents: number;
+};
+
+export type VerticalTimelinePageGroup = {
+	descriptionUrl?: string;
+	endTime: moment.Moment;
+	nestedItems: SessionEvent[];
+	pageGroup: true;
+	subtitle: string;
+	time: moment.Moment;
+	title: string;
 	totalEvents: number;
 };
 
 export type VerticalTimelineSession = {
 	applicationId: string;
-	attributes: UserSessionAttributes;
+	attributes: Record<string, unknown>;
+	browserName?: string;
 	device: string;
-	endTime: Date;
-	nestedItems: SessionEvent[];
-	time: moment.Moment;
+	endTime?: Date | string | null;
+	individualId?: string;
+	individualName?: string;
+	individualUrl?: string;
+	isAnonymous?: boolean;
+	nestedItems: (SessionEvent | VerticalTimelinePageGroup)[];
+	noTimestamps?: boolean;
+	session: true;
+	time: string;
+	totalEvents: number;
 	userAgent: string;
 };
 
@@ -131,12 +145,21 @@ export const buildLegendItems = ({
  * @param {Array} events Array of UserSessions events.
  * @returns {Array.<Object>} Array of objects for a vertical timeline.
  */
+
+/**
+ * An external data source reaches Analytics Cloud through a webhook, which it
+ * announces in the session's user agent. Its events are not page bound, so they
+ * are neither linked to a dashboard nor grouped by page.
+ */
+export const isWebhookUserAgent = (userAgent?: string): boolean =>
+	!!userAgent?.toLowerCase().includes('webhook');
+
 export const formatEvents = (
 	events: UserSessionEvent[],
 	userAgent?: string,
 	context: EventDashboardContext = {}
 ): Array<SessionEvent> => {
-	const isWebhook = userAgent?.toLowerCase().includes('webhook');
+	const isWebhook = isWebhookUserAgent(userAgent);
 
 	return events.map((event) => {
 		const {
@@ -180,6 +203,115 @@ export const formatEvents = (
 };
 
 /**
+ * Only DXP events are page bound — they carry the page they happened on in
+ * their canonical URL. Events from an external data source are not, so they get
+ * no key and stay out of the grouping.
+ */
+const getPageGroupKey = ({
+	applicationId,
+	canonicalUrl,
+	url,
+}: UserSessionEvent): string =>
+	LIFERAY_DXP_APPLICATION_IDS.has(applicationId)
+		? canonicalUrl || url || ''
+		: '';
+
+/**
+ * Groups a session's events by the page they happened on, so the activity
+ * stream shows one entry per visited page instead of a raw list of events.
+ *
+ * Events are keyed by their canonical URL, so a page visited more than once in
+ * the same session collapses into a single entry carrying the time range and
+ * event count of every event on that page. Events that are not page bound (an
+ * external data source, or a DXP event with no URL) stay as direct session
+ * items. Groups and those loose events are ordered by their most recent event,
+ * newest first, matching how the timeline already orders days and sessions.
+ * Within a group the events keep the order they arrive in.
+ */
+export const groupEventsByPage = (
+	events: UserSessionEvent[],
+	userAgent?: string,
+	context: EventDashboardContext = {}
+): (SessionEvent | VerticalTimelinePageGroup)[] => {
+	const eventsByPage = new Map<string, UserSessionEvent[]>();
+	const pagelessEvents: UserSessionEvent[] = [];
+
+	events.forEach((event) => {
+		const pageKey = getPageGroupKey(event);
+
+		if (!pageKey) {
+			pagelessEvents.push(event);
+
+			return;
+		}
+
+		const pageEvents = eventsByPage.get(pageKey) ?? [];
+
+		pageEvents.push(event);
+
+		eventsByPage.set(pageKey, pageEvents);
+	});
+
+	const sortableItems: {
+		item: SessionEvent | VerticalTimelinePageGroup;
+		latestTime: number;
+	}[] = [];
+
+	eventsByPage.forEach((pageEvents, pageKey) => {
+		const eventTimes = pageEvents.map(({createDate}) =>
+			moment(createDate).valueOf()
+		);
+
+		const latestTime = Math.max(...eventTimes);
+
+		// The page title lives on the page-view event; other events on the same
+		// page (a form submission, a comment) carry their own asset title, so
+		// prefer the page-view event when naming and linking the group.
+
+		const pageEvent =
+			pageEvents.find(
+				({applicationId}) => applicationId === AssetTypes.WebPage
+			) ?? pageEvents[0];
+
+		const subtitle = getSafeDecodedURIComponent(pageKey);
+
+		sortableItems.push({
+			item: {
+				descriptionUrl: getEventDashboardUrl(pageEvent, {
+					...context,
+					isWebhook: isWebhookUserAgent(userAgent),
+				}),
+				endTime: moment(latestTime),
+
+				// The page group's own subtitle already shows the page URL, so
+				// its nested events don't repeat it.
+
+				nestedItems: formatEvents(pageEvents, userAgent, context).map(
+					(event) => ({...event, subtitle: undefined})
+				),
+				pageGroup: true,
+				subtitle,
+				time: moment(Math.min(...eventTimes)),
+				title: pageEvent.pageTitle || pageEvent.assetTitle || subtitle,
+				totalEvents: pageEvents.length,
+			},
+			latestTime,
+		});
+	});
+
+	formatEvents(pagelessEvents, userAgent, context).forEach((item, index) =>
+		sortableItems.push({
+			item,
+			latestTime: moment(pagelessEvents[index].createDate).valueOf(),
+		})
+	);
+
+	return sortableItems
+		.sort((a, b) => b.latestTime - a.latestTime)
+		.map(({item}) => item);
+};
+
+/**
  * Formats datetime to today or the current date.
  * @param {Date|string|number} datetime - Any value accepeted by Moment.
  * @returns {Moment} Date label to be displayed.
@@ -195,105 +327,100 @@ export const formatGroupingTime = (
 };
 
 /**
- * Marks each session item (i.e. not a day or user header) with whether it
- * starts or ends its group, so the VerticalTimeline can bound the connecting
- * line to the first and last session dots of the group instead of overflowing.
+ * Groups sessions by the day they started, newest day first, and emits a day
+ * header followed by that day's sessions. Shared by the account and individual
+ * activity streams, which then order the sessions inside each day.
  */
+export const groupSessionsByDay = <
+	T extends {createDate: string; events?: unknown[] | null},
+>(
+	sessions: T[]
+): {daySessions: T[]; header: VerticalTimelineHeader}[] => {
+	const sessionsByDay = new Map<string, T[]>();
 
-export const markGroupBoundaries = <T extends Record<string, unknown>>(
-	items: T[]
-): T[] =>
-	items.map((item, index) => {
-		if (item.header || item.userHeader) {
-			return item;
-		}
+	sessions.forEach((session) => {
+		const dayKey = moment.utc(session.createDate).startOf('day').format();
 
-		const previous = items[index - 1];
-		const next = items[index + 1];
+		const daySessions = sessionsByDay.get(dayKey) ?? [];
 
-		return {
-			...item,
-			groupEnd: !next || Boolean(next.header || next.userHeader),
-			groupStart:
-				!previous || Boolean(previous.header || previous.userHeader),
-		};
+		daySessions.push(session);
+
+		sessionsByDay.set(dayKey, daySessions);
 	});
 
-/**
- * Format sessions into a format usable by the VerticalTimeline component while grouping them by day.
- * @param {Array} sessions
- * @returns {Array.<Object>} An array of session objects.
- */
-export const formatSessions = (
-	sessions: UserSession[],
-	context: EventDashboardContext = {}
-): (VerticalTimelineHeader | VerticalTimelineSession)[] =>
-	markGroupBoundaries(
-		flow(
-			groupBy(({createDate}: UserSession) =>
-				moment.utc(createDate).startOf('day').format()
-			),
-			mapValues((items: unknown) =>
-				(items as (UserSession & {createDate: string})[]).map(
-					({
-						browserName,
-						completeDate,
-						contentLanguageID,
-						createDate,
-						devicePixelRatioz,
-						deviceType,
-						events,
-						languageID,
-						screenHeight,
-						screenWidth,
-						timezoneOffset,
-						userAgent,
-					}) => ({
-						applicationId:
-							(events as unknown as UserSessionEvent[])[0]
-								?.applicationId ?? '',
-						attributes: {
-							contentLanguageID,
-							devicePixelRatioz,
-							header: Liferay.Language.get('session-attributes'),
-							languageID,
-							screenHeight,
-							screenWidth,
-							timezoneOffset,
-							userAgent,
-						},
-						browserName,
-						device: deviceType,
-						endTime: completeDate,
-						nestedItems: formatEvents(
-							events as unknown as UserSessionEvent[],
-							userAgent,
-							context
-						),
-						time: createDate,
-						userAgent,
-					})
-				)
-			),
-			toPairs,
-			orderBy([([time]) => moment(time).unix()], ['desc']),
-			map(([time, items]: [string, {nestedItems: unknown[]}[]]) => [
-				{
+	return Array.from(sessionsByDay.keys())
+		.sort((a, b) => moment(b).valueOf() - moment(a).valueOf())
+		.map((dayKey) => {
+			const daySessions = sessionsByDay.get(dayKey) ?? [];
+
+			return {
+				daySessions: daySessions.sort(
+					(a, b) =>
+						moment(b.createDate).valueOf() -
+						moment(a.createDate).valueOf()
+				),
+				header: {
 					header: true,
-					title: formatGroupingTime(time),
-					totalEvents: items.reduce(
-						(
-							previousValue: number,
-							currentValue: {nestedItems: unknown[]}
-						) => previousValue + currentValue.nestedItems.length,
+					title: formatGroupingTime(dayKey),
+					totalEvents: daySessions.reduce(
+						(total, {events}) => total + (events?.length ?? 0),
 						0
 					),
 				},
-				items,
-			]),
-			flattenDepth(3)
-		)(sessions) as (VerticalTimelineHeader | VerticalTimelineSession)[]
-	);
+			};
+		});
+};
+
+/**
+ * Formats individual user sessions for the shared VerticalTimeline, grouping
+ * them by day and grouping each session's events by the page they happened on.
+ * The individual stream has no per-user level — the individual is the page's
+ * subject — so a day header is followed straight by that day's sessions.
+ */
+export const formatSessions = (
+	sessions: UserSession[] = [],
+	context: EventDashboardContext = {}
+): (VerticalTimelineHeader | VerticalTimelineSession)[] => {
+	const items: (VerticalTimelineHeader | VerticalTimelineSession)[] = [];
+
+	groupSessionsByDay(sessions).forEach(({daySessions, header}) => {
+		items.push(header);
+
+		daySessions.forEach((session) => {
+			const events = (session.events ??
+				[]) as unknown as UserSessionEvent[];
+
+			items.push({
+				applicationId: events[0]?.applicationId ?? '',
+				attributes: {
+					contentLanguageID: session.contentLanguageID,
+					devicePixelRatioz: session.devicePixelRatioz,
+					header: Liferay.Language.get('session-attributes'),
+					languageID: session.languageID,
+					screenHeight: session.screenHeight,
+					screenWidth: session.screenWidth,
+					timezoneOffset: session.timezoneOffset,
+					userAgent: session.userAgent,
+				},
+				browserName: session.browserName,
+				device: session.deviceType,
+				endTime: session.completeDate,
+				nestedItems: groupEventsByPage(
+					events,
+					session.userAgent,
+					context
+				),
+				noTimestamps: isWebhookUserAgent(session.userAgent),
+				session: true,
+				time: session.createDate,
+				totalEvents: events.length,
+				userAgent: session.userAgent,
+			});
+		});
+	});
+
+	return items;
+};
 
 /**
  * Helper function get the correct pluralization of count label.

@@ -248,7 +248,7 @@ const ActivityStreamCard: React.FC<IActivityStreamCardProps> = ({
 						<PaginatedVerticalTimeline
 							{...sessionsMappedResults}
 							delta={delta}
-							initialExpanded={false}
+							initialExpanded
 							noResultsRenderer={noResultsRenderer}
 							onDeltaChange={onDeltaChange}
 							onPageChange={onPageChange}
